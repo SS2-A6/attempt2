@@ -28,4 +28,17 @@
 *.out
 *.app
 
+mbed-os/
 mbed-os
+BUILD/
+.build/
+symbols/
+.settings/
+backup/
+.cproject
+Makefile
+config.yaml
+.project
+
+.*.swp
+.*.swo
