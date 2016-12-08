@@ -7,9 +7,11 @@ extern Timer timer;
 extern uint8_t supply_state;
 
 
+
 int before_time = 0;
-int move_arm_time = 0;
+int move_arm_time = 2147483647;
 int before_time_saving = 0;  // before_time を計算するための一時保存用変数．特に意味は無い．
+uint8_t first_ball_flag = 1;  // 1：ピンポン球1つ目フラグ，0：ピンポン球2つ目以降フラグ
 // ピンポン球の検出 & ステートの遷移を管理する関数
 void ball_psd_read() {
 
@@ -29,7 +31,7 @@ void ball_psd_read() {
 		if ( ball_psd_diff < -ball_psd_offset ) {
 			ball_count++;
 			supply_state = 1;
-			before_time = before_time_saving;  // before_time に前回ピンポン球取得時の時刻を記録しておく
+			before_time = before_time_saving;  // before_time に前回ピンポン球取得時の時刻を記録する
 			before_time_saving = timer.read_ms();  // before_time_saving には今回分の時刻を一時保存しておいて，次回の before_time に活用する
 			Thread::wait(1000);
 		}
@@ -45,12 +47,13 @@ void ball_psd_read() {
 			move_arm_out();
 			move_arm_in();
 			supply_state = 0;
-			move_arm_time = timer.read_ms();  // 最後にアームを動かした時間を記録しておく
+			first_ball_flag = 1;  // 次出てくるピンポン球は第1球として扱うので注意
+			move_arm_time = timer.read_ms();  // 最後にアームを動かした時刻を記録しておく
 		}
 		// どっちに供給権があるのか不明な，空白状態のとき
 		else if ( supply_state == 0 ) {
-			// 基本は何もしないで，ステイ
-			// もしも空白状態が長く続いているなら，紛失している可能性があるので，再び supply_state = 2 へ入る
+			// 基本は何もしないでステイ．
+			// もしも空白状態が長く続いているなら供給権紛失している可能性があるので，再び supply_state = 2 へ入る
 			if ( (timer.read_ms()-move_arm_time) > 4000 ) {
 				supply_state = 2;
 			}
@@ -63,21 +66,20 @@ void ball_psd_read() {
 
 #define time_offset 500  // 規定時間をどれだけオーバーしたら，供給権紛失とみなすか
 #define time_eq(now,before,offset) ( now - before + offset )
-uint8_t first_ball_flag = 1;  // 1：ピンポン球1つ目フラグ，0：ピンポン球2つ目以降フラグ
 
 // 自分に供給権があると"思われる"ときの関数
 // 1. before_time と now_time を比較して，本当に供給権を保持しているのか確認
 // 2. 紛失していれば，supply_state=2 へ入る
 // 3. 保持していれば，そのままステイ
-// 4. ピンポン球1つ目は要注意
+// 4. 毎度，供給権獲得後のピンポン球1つ目は要注意
 void supply_me ( int now_time ) {
 
-	// ピンポン球1つ目は，とりあえずステイ
+	// 毎度，供給権獲得後のピンポン球1つ目は，とりあえずステイ
 	if ( first_ball_flag == 1 ) {
-		first_ball_flag = 0;
+		first_ball_flag = 0;  // フラグクリア
 	}
 
-	// ピンポン球2つ目以降の，序盤戦 (00s-60s)
+	// 序盤戦 (00s-60s)
 	else if ( now_time < 1000 * 60 ) {
 		// 供給権紛失条件
 		if ( time_eq(now_time,before_time,time_offset) > 2000+time_offset) {
@@ -110,13 +112,13 @@ void supply_me ( int now_time ) {
 }
 
 
+
 // アームを動かして，供給権エリアに入る関数
 void move_arm_in() {
-
 }
+
 
 
 // アームを動かして，供給権エリアから出る関数
 void move_arm_out() {
-
 }

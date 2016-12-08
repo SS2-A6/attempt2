@@ -14,12 +14,12 @@ int main() {
 	timer.start();
 
 	// スレッド1の起動 & エラーの検出
-	osStatus err = thread1.start(&ball_psd_read);
+	osStatus err = thread1.start( &ball_psd_read );
 	if (err) {
 		pc.printf("thread1 error!!\n");
 	}
 
-
+	// メインループ
 	for(;;){
 
 	}
