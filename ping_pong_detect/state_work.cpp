@@ -10,6 +10,7 @@ extern int before_time;
 
 
 int move_arm_time = 2147483647;  // 最後にアームを動かした時刻を記録しておく
+#define rescue_time 6000  // 空白状態での供給権紛失を回避するための制限時間
 // ステートごとに動作を行う関数
 void state_work() {
 
@@ -35,8 +36,8 @@ void state_work() {
 		// どっちに供給権があるのか不明な，空白状態のとき
 		else if (supply_state == 0) {
 			// 基本は何もしないでステイ．
-			// もしも空白状態が長く続いているなら供給権紛失している可能性があるので，再び supply_state = 2 へ入る
-			if ((timer.read_ms() - move_arm_time) > 4000) {
+			// もしも空白状態が長く続いているなら供給権紛失している可能性があるので，再び supply_state = 2 へ入って危機回避
+			if ( (timer.read_ms() - move_arm_time) > rescue_time ) {
 				supply_state = 2;
 			}
 		}
@@ -47,7 +48,7 @@ void state_work() {
 
 
 
-#define time_offset 500  // 規定時間をどれだけオーバーしたら，供給権紛失とみなすか
+#define time_offset 1000  // 規定時間をどれだけオーバーしたら，供給権紛失とみなすか
 #define time_eq(t1,t2,err) ( (t2 - err <= t1) && (t1 <= t2 + err) )   // t1とt2を比較して，errの範囲内で一致判定を返す関数
 #define time_err 100  // 供給装置の誤差予想
 

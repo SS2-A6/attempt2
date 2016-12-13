@@ -2,11 +2,15 @@
 #include "attempt2.h"
 
 extern int before_time;
+extern uint32_t ball_psd;
+extern int32_t ball_psd_diff;
 
 Serial pc(USBTX, USBRX);
 Timer timer;
 uint16_t ball_count = 0;
 uint8_t supply_state = 0;  // 0:空白状態, 1：こちらが供給権, 2：相手が供給権
+
+Mutex mutex;
 
 
 int main() {
@@ -32,7 +36,16 @@ int main() {
 	for(;;){
 
 		// 実験用
-		pc.printf("state=%d, ball_count=%d, before_time=%d, now_time=%d, time_over=%d \n", supply_state, ball_count, before_time, timer.read_ms(), timer.read_ms()-before_time);
+		mutex.lock();
+		pc.printf("state=%d, ball_count=%d, psd=%lu, psd_diff=%ld, before_time=%d, now_time=%d, time_over=%d \n",
+				supply_state,
+				ball_count,
+				ball_psd,
+				ball_psd_diff,
+				before_time,
+				timer.read_ms(),
+				timer.read_ms()-before_time);
+		mutex.unlock();
 		//
 
 	}
