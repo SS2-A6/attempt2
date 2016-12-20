@@ -4,15 +4,15 @@
         "size": {
             ".data": 4, 
             ".bss": 9, 
-            ".text": 67
+            ".text": 59
         }
     }, 
     {
         "module": "Misc", 
         "size": {
             ".data": 2228, 
-            ".bss": 344, 
-            ".text": 44955
+            ".bss": 408, 
+            ".text": 38459
         }
     }, 
     {
@@ -28,7 +28,7 @@
         "size": {
             ".data": 0, 
             ".bss": 8, 
-            ".text": 1032
+            ".text": 1176
         }
     }, 
     {
@@ -65,11 +65,11 @@
     }, 
     {
         "summary": {
-            "total_flash": 78660, 
-            "static_ram": 10692, 
+            "total_flash": 72300, 
+            "static_ram": 10756, 
             "stack": 0, 
             "heap": 0, 
-            "total_ram": 10692
+            "total_ram": 10756
         }
     }
 ]
