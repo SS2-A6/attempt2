@@ -10,7 +10,7 @@ extern int before_time;
 
 
 int move_arm_time = 2147483647;  // 最後にアームを動かした時刻を記録しておく
-#define rescue_time 6000  // 空白状態での供給権紛失を回避するための制限時間
+#define rescue_time 10000  // 空白状態での供給権紛失を回避するための制限時間
 // ステートごとに動作を行う関数
 void state_work() {
 
@@ -25,11 +25,13 @@ void state_work() {
 		// 供給権を紛失し，相手が保持しているとき
 		else if (supply_state == 2) {
 			pc.printf("*** move arm!!\n");
-			// 供給権を取り返すため，アームを動かす
-			move_arm_out();
-			move_arm_in();
-			supply_state = 0;
+			// 供給権を取り返すため，アームフラグを立て，B機に動かしてもらう
+			move_arm_flag = 1;
 			first_ball_flag = 1;  // 次出てくるピンポン球は第1球として扱うので注意
+			// アームフラグをxbeeで読み，降ろされるまで次に進まない
+			while ( xbee.read(move_arm_flag) == 1 ) {
+			}
+			supply_state = 0;
 			move_arm_time = timer.read_ms();  // 最後にアームを動かした時刻を記録しておく
 		}
 
@@ -97,14 +99,4 @@ void supply_me( int now_time ) {
 		}
 	}
 
-}
-
-
-
-// アームを動かして，供給権エリアに入る関数
-void move_arm_in() {
-}
-
-// アームを動かして，供給権エリアから出る関数
-void move_arm_out() {
 }
