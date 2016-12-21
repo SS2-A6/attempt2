@@ -29,3 +29,13 @@
 *.app
 
 mbed-os
+.*DS_Store
+.cproject
+.project
+.settings/
+BUILD/
+.*swo
+.*swp
+symbols/
+backup/
+
