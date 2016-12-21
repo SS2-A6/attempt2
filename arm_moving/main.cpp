@@ -3,22 +3,42 @@
 
 Serial pc(USBTX, USBRX);
 Serial xbee();
-PwmOut servo(PB_3);
+PwmOut servo1(PB_3);  // 中央の超音波センサ用アーム
+PwmOut servo2(PB_4);  // 手前の超音波センサ用アーム
 DigitalIn mag(PB_5);
 PwmOut motor1(PA_5);
 PwmOut motor2(PA_6);
 
 float make_arctan ( int8_t from_degree, int8_t to_degree, uint16_t t, uint16_t max_time, float x_p, float y_p );
-void moving_arm ( int8_t from_degree, int8_t to_degree, uint16_t max_time, float x_p, float y_p );
+
 void moving ( uint8_t move_mode, uint8_t time_mode, uint16_t move_time );
 
+// 通信したい値
+// supply_state, ready_flag_A, ready_flag_B
 
 int main() {
 
 	pc.baud(115200);  // ボーレートの設定
-	servo.period(0.014);  // サーボの周期
+	servo1.period(0.014);  // サーボの周期
+	servo2.period(0.014);  // サーボの周期
 
-	if (  ) {
+	// 戦闘準備 (開始後の定位置へのレール移動)
+	while ( !mag.read() ) {
+		moving(2, 0, 0);
+	}
+	moving(1, 1, 2000);  // 移動時間要チューニング
+	ready_flag_B = 1;
+
+	// A機側の準備が整うまで待機
+	while ( (!ready_flag_A)&&(!read_flag_B) ) {}
+
+	// 戦闘開始
+	moving_arm(-90, 0, -90, 0, 3000, 30, 90);
+	while ( true ) {
+
+		if ( supply_state == 2 ) {
+			moving_arm(0, -90, 2000, 30, 90);
+		}
 
 	}
 
@@ -29,8 +49,8 @@ int main() {
 void debug_test () {
 
 	// アーム移動テスト
-	//moving_arm( 0, -45, 3000, 30, 90);
-	//moving_arm( -45, 0, 2000, 40, 90);
+	//moving_arm( 1, 0, -45, 3000, 30, 90);
+	//moving_arm( 1, -45, 0, 2000, 40, 90);
 
 	/*
 	// マグネットテスト
@@ -92,15 +112,17 @@ void moving ( uint8_t move_mode, uint8_t time_mode, uint16_t move_time ) {
 
 
 // アーム移動関数
-// 引数 ( スタート角度, ゴール角度, 移動完了時間, 中間滑らか度, 漸近度 )
+// 引数 ( スタート角度1, ゴール角度1, スタート角度2, ゴール角度2, 移動完了時間, 中間滑らか度, 漸近度 )
+// 各角度の番号はサーボ番号を表す
 // 中間滑らか度 (中間傾斜区間を全体の何%ほどにするか)
 // 漸近度 (漸近区間を真値に何%ほど近づけるか．サーボ安全率も担保するため固定推奨)
-void moving_arm ( int8_t from_degree, int8_t to_degree, uint16_t max_time, float x_p, float y_p ) {
+void moving_arm ( int8_t from_degree1, int8_t to_degree1, int8_t from_degree2, int8_t to_degree2, uint16_t max_time, float x_p, float y_p ) {
 
 	uint16_t t;  // 移動現在時刻 (ms)
 	uint16_t delta_t = 5;  // 分割時間 (ms) (細かくすれば動き滑らか)
 	for ( t=0; t<=max_time; t+=delta_t ) {
-		servo.pulsewidth( make_arctan( from_degree, to_degree, t, max_time, x_p, y_p ) );
+		servo1.pulsewidth( make_arctan( from_degree1, to_degree1, t, max_time, x_p, y_p ) );
+		servo2.pulsewidth( make_arctan( from_degree2, to_degree2, t, max_time, x_p, y_p ) );
 		Thread::wait( delta_t );
 	}
 
