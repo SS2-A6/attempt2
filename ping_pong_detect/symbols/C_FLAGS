@@ -1,0 +1,4 @@
+---
+- -std=gnu99
+- -include
+- mbed_config.h

@@ -1,0 +1,83 @@
+[
+    {
+        "module": "Fill", 
+        "size": {
+            ".data": 7, 
+            ".bss": 10, 
+            ".text": 47
+        }
+    }, 
+    {
+        "module": "Misc", 
+        "size": {
+            ".data": 2237, 
+            ".bss": 379, 
+            ".text": 46927
+        }
+    }, 
+    {
+        "module": "drivers", 
+        "size": {
+            ".data": 4, 
+            ".bss": 160, 
+            ".text": 3944
+        }
+    }, 
+    {
+        "module": "features/netsocket", 
+        "size": {
+            ".data": 0, 
+            ".bss": 0, 
+            ".text": 76
+        }
+    }, 
+    {
+        "module": "hal", 
+        "size": {
+            ".data": 0, 
+            ".bss": 8, 
+            ".text": 1068
+        }
+    }, 
+    {
+        "module": "platform", 
+        "size": {
+            ".data": 4, 
+            ".bss": 297, 
+            ".text": 3056
+        }
+    }, 
+    {
+        "module": "rtos", 
+        "size": {
+            ".data": 4, 
+            ".bss": 4, 
+            ".text": 1228
+        }
+    }, 
+    {
+        "module": "rtos/rtx", 
+        "size": {
+            ".data": 20, 
+            ".bss": 6870, 
+            ".text": 11232
+        }
+    }, 
+    {
+        "module": "targets/TARGET_STM", 
+        "size": {
+            ".data": 4, 
+            ".bss": 776, 
+            ".text": 12250
+        }
+    }, 
+    {
+        "summary": {
+            "total_flash": 82108, 
+            "static_ram": 10784, 
+            "stack": 0, 
+            "heap": 0, 
+            "total_ram": 10784
+        }
+    }
+]

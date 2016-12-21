@@ -1,0 +1,6 @@
+---
+- -std=gnu++98
+- -fno-rtti
+- -Wvla
+- -include
+- mbed_config.h
