@@ -5,17 +5,17 @@ Serial pc(USBTX, USBRX);
 Serial xbee();
 PwmOut servo1(PB_3);  // 中央の超音波センサ用アーム
 PwmOut servo2(PB_4);  // 手前の超音波センサ用アーム
-DigitalIn mag(PB_5);
+DigitalIn mag(PB_5);  // マグネットセンサ
 PwmOut motor1(PA_5);
 PwmOut motor2(PA_6);
 
+// プロトタイプ宣言
 float make_arctan ( int8_t from_degree, int8_t to_degree, uint16_t t, uint16_t max_time, float x_p, float y_p );
+void move ( uint8_t move_mode, uint8_t time_mode, uint16_t move_time );
+void move_arm ( int8_t from_degree1, int8_t to_degree1, int8_t from_degree2, int8_t to_degree2, uint16_t move_arm_time, float x_p, float y_p );
 
-void moving ( uint8_t move_mode, uint8_t time_mode, uint16_t move_time );
 
-// 通信したい値
-// supply_state, ready_flag_A, ready_flag_B, move_arm_flag
-
+// B機メイン関数
 int main() {
 
 	pc.baud(115200);  // ボーレートの設定
@@ -29,19 +29,21 @@ int main() {
 	move(1, 1, 2000);  // 戦闘位置まで後進
 	ready_flag_B = 1;  // B機は準備OK
 
-	// A機側の準備が整うまで待機
-	while ( ( !xbee.read(ready_flag_A) )&&( !read_flag_B ) ) {
+	// A機・B機両方の準備が整うまで待機
+	while ( ( !xbee.read(ready_flag_A) )||( !ready_flag_B ) ) {
 
 	}
 
-	// 戦闘開始
-	move_arm(-90, 0, -90, -60, 3000, 30, 90);  // 初回の供給権確保へ
+	// B機戦闘開始
+
+	// 最初の供給権確保へ (A機はスレッド起動中なので少し時間かけてもよい)
+	move_arm(-90, 0, -90, -60, 3500, 30, 90);
 
 	while ( true ) {
 
 		// ステートが2で，かつ，アームフラグ=1が立てられたら，アームを動かして供給権取り返す
 		if ( ( xbee.read(supply_state) == 2 )&&( xbee.read(move_arm_flag) == 1 ) ) {
-			move_arm_flag = 0;  // アームフラグクリア(送信)
+			move_arm_flag = 0;  // アームフラグクリア
 			move_arm(0, -60, -60, 0, 2000, 30, 90);
 			move_arm(-60, 0, 0, -60, 2000, 30, 90);
 		}
