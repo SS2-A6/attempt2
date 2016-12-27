@@ -8,16 +8,21 @@ Serial pc(USBTX, USBRX);
 //PwmOut motor2(PA_6);
 
 
-#define RGB_Test
+#define rgb
 
-#ifdef RGB_Test
-DigitalOut myled(LED1);
+#ifdef rgb
+//DigitalOut myled(LED1);
 RGB led;
 
 int main() {
+    DigitalOut myled(LED1);     // LED1 == PA_5
+    int i = 0;
+
     while(1) {
         myled = 1; // LED is ON
         Thread::wait(500);
+
+        int i = 0;
 
         led.white();
         Thread::wait(500);
@@ -39,6 +44,55 @@ int main() {
         led.black();
         Thread::wait(300); // 200 ms
     }
-    return 0;
+}
+#elif defined(servo)
+PwmOut s1(PB_4);
+PwmOut s2(PB_3);
+
+int main(){
+
+    s1.period_us(14000);
+    s2.period_us(14000);
+    while(1){
+        s1.pulsewidth_us(600);
+        s2.pulsewidth_us(600);
+        Thread::wait(500);
+
+        s1.pulsewidth_us(1400);
+        s2.pulsewidth_us(1400);
+        Thread::wait(500);
+
+        s1.pulsewidth_us(2000);
+        s2.pulsewidth_us(2000);
+        Thread::wait(500);
+    }
+}
+#elif defined(motor)
+PwmOut m1(PA_5);
+PwmOut m2(PA_6);
+#define F 0.0001d
+int main(){
+    m1.period_ms(10);
+    m2.period_ms(10);
+
+    m1.pulsewidth_us(10000);
+    m2.pulsewidth_us(10000);
+
+    uint64_t t = 0;
+    for(;;t++){
+        m1.pulsewidth_us(5000 + (int)(5000*sin(2*M_PI*F*t)));
+        m2.pulsewidth_us(5000 + (int)(5000*cos(2*M_PI*F*t)));
+    }
+
+}
+#elif defined(magnet)
+DigitalIn mag(PB_5);
+DigitalOut led(PA_5);
+int main(){
+   while(1){
+       led = mag;
+   }
 }
 #endif
+
+

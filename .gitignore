@@ -38,4 +38,6 @@ BUILD/
 .*swp
 symbols/
 backup/
-
+.idea/
+.vscode/
+*.pyc
