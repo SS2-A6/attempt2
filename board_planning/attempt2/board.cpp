@@ -9,9 +9,9 @@
 #include "attempt2/board.h"
 
 RGB::RGB(PinName r, PinName g, PinName b, uint8_t h, uint8_t l){
-	R = new DigitalOut(r);
-	G = new DigitalOut(g);
-	B = new DigitalOut(b);
+    R = new DigitalOut(r);
+    G = new DigitalOut(g);
+    B = new DigitalOut(b);
     logic = (h << 1) | l;
     black();
 }

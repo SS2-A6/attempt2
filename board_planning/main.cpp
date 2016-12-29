@@ -3,7 +3,7 @@
 
 Serial pc(USBTX, USBRX);
 
-#define rgb_
+#define serial
 
 #ifdef rgb_
 //DigitalOut myled(LED1);
@@ -89,6 +89,15 @@ int main(){
        led = mag;
    }
 }
+#elif defined(serial)
+void callback(){
+    pc.printf("got %c\n", pc.getc());
+    pc.printf("next (%d)\n", (int)pc.getc());
+}
+int main(){
+    pc.baud(9600);
+    pc.attach(&callback);
+    while(1){
+    }
+}
 #endif
-
-
