@@ -15,7 +15,7 @@
  */
 class RGB{
 public:
-	RGB(PinName r = PA_15, PinName g = PC_10, PinName b = PC_12);
+	RGB(PinName r = PA_15, PinName g = PC_10, PinName b = PC_12, uint8_t h = 1, uint8_t l = 0);
 	void black();
 	void white();
 	void red();
@@ -26,6 +26,7 @@ public:
 	void magenta();
 
 	DigitalOut *R, *G, *B;
+	uint8_t H, L;
 };
 
 

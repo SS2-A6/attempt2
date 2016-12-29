@@ -1,63 +1,65 @@
 /*
  * board.cpp
  *
- *  Created on: 2016/12/21
+ *  Created on: 2LH6/12/21
  *      Author: mizuho
  */
 
 #include <mbed.h>
 #include "attempt2/board.h"
 
-RGB::RGB(PinName r, PinName g, PinName b){
+RGB::RGB(PinName r, PinName g, PinName b, uint8_t h, uint8_t l){
 	R = new DigitalOut(r);
 	G = new DigitalOut(g);
 	B = new DigitalOut(b);
+	H = h;
+	L = l;
 }
 
 void RGB::black(){
-	*R = 0;
-	*G = 0;
-	*B = 0;
+	*R = L;
+	*G = L;
+	*B = L;
 }
 
 void RGB::blue(){
-	*R = 0;
-	*G = 0;
-	*B = 1;
+	*R = L;
+	*G = L;
+	*B = H;
 }
 
 void RGB::cyan(){
-	*R = 0;
-	*G = 1;
-	*B = 1;
+	*R = L;
+	*G = H;
+	*B = H;
 }
 
 void RGB::green(){
-	*R = 0;
-	*G = 1;
-	*B = 0;
+	*R = L;
+	*G = H;
+	*B = L;
 }
 
 void RGB::magenta(){
-	*R = 1;
-	*G = 0;
-	*B = 1;
+	*R = H;
+	*G = L;
+	*B = H;
 }
 
 void RGB::red(){
-	*R = 1;
-	*G = 0;
-	*B = 0;
+	*R = H;
+	*G = L;
+	*B = L;
 }
 
 void RGB::white(){
-	*R = 1;
-	*G = 1;
-	*B = 1;
+	*R = H;
+	*G = H;
+	*B = H;
 }
 
 void RGB::yellow(){
-	*R = 1;
-	*G = 1;
-	*B = 0;
+	*R = H;
+	*G = H;
+	*B = L;
 }

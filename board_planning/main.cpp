@@ -2,17 +2,13 @@
 #include "attempt2/board.h"
 
 Serial pc(USBTX, USBRX);
-//PwmOut servo(PB_3);
-//DigitalIn mag(PB_5);
-//PwmOut motor1(PA_5);
-//PwmOut motor2(PA_6);
-
 
 #define rgb
 
 #ifdef rgb
 //DigitalOut myled(LED1);
-RGB led;
+//RGB led;
+RGB led(PA_15, PC_12, PC_10, 0, 1);
 
 int main() {
     DigitalOut myled(LED1);     // LED1 == PA_5
