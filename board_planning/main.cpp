@@ -3,9 +3,9 @@
 
 Serial pc(USBTX, USBRX);
 
-#define rgb
+#define rgb_
 
-#ifdef rgb
+#ifdef rgb_
 //DigitalOut myled(LED1);
 //RGB led;
 RGB led(PA_15, PC_12, PC_10, 0, 1);
@@ -18,7 +18,7 @@ int main() {
         myled = 1; // LED is ON
         Thread::wait(500);
 
-        int i = 0;
+        i = 1;
 
         led.white();
         Thread::wait(500);

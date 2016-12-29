@@ -24,9 +24,10 @@ public:
 	void cyan();
 	void yellow();
 	void magenta();
+    void rgb(uint8_t r, uint8_t g, uint8_t b);
 
 	DigitalOut *R, *G, *B;
-	uint8_t H, L;
+	uint8_t logic = 0b00000000 | 0b00000010;
 };
 
 

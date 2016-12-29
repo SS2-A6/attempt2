@@ -12,54 +12,44 @@ RGB::RGB(PinName r, PinName g, PinName b, uint8_t h, uint8_t l){
 	R = new DigitalOut(r);
 	G = new DigitalOut(g);
 	B = new DigitalOut(b);
-	H = h;
-	L = l;
+    logic = (h << 1) | l;
+    black();
 }
 
 void RGB::black(){
-	*R = L;
-	*G = L;
-	*B = L;
+    rgb(0,0,0);
 }
 
 void RGB::blue(){
-	*R = L;
-	*G = L;
-	*B = H;
+    rgb(0,0,1);
 }
 
 void RGB::cyan(){
-	*R = L;
-	*G = H;
-	*B = H;
+    rgb(0,1,1);
 }
 
 void RGB::green(){
-	*R = L;
-	*G = H;
-	*B = L;
+    rgb(0,1,0);
 }
 
 void RGB::magenta(){
-	*R = H;
-	*G = L;
-	*B = H;
+    rgb(1,0,1);
 }
 
 void RGB::red(){
-	*R = H;
-	*G = L;
-	*B = L;
+    rgb(1,0,0);
 }
 
 void RGB::white(){
-	*R = H;
-	*G = H;
-	*B = H;
+    rgb(1,1,1);
 }
 
 void RGB::yellow(){
-	*R = H;
-	*G = H;
-	*B = L;
+    rgb(1, 1, 0);
+}
+
+inline void RGB::rgb(uint8_t r, uint8_t g, uint8_t b) {
+    *R = (logic >> r) & 1;
+    *G = (logic >> g) & 1;
+    *B = (logic >> b) & 1;
 }
