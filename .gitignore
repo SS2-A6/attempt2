@@ -38,4 +38,8 @@ BUILD/
 .*swp
 symbols/
 backup/
-
+mbed_settings.pyc
+cmake-build*/
+.idea/
+.vscode/
+Makefile
