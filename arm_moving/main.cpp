@@ -1,18 +1,40 @@
 #include <mbed.h>
 #include <math.h>
+// B機：情報を受信してアームを動かし，供給権奪取
 
-Serial pc(USBTX, USBRX);
-Serial xbee();
+Serial pc(PA_9, PA_10);  // Xbee_B
+Serial debug(USBTX, USBRX);  // デバッグ用print
 PwmOut servo1(PB_3);  // 中央の超音波センサ用アーム
 PwmOut servo2(PB_4);  // 手前の超音波センサ用アーム
 DigitalIn mag(PB_5);  // マグネットセンサ
-PwmOut motor1(PA_5);
-PwmOut motor2(PA_6);
+PwmOut motor1(PA_5);  // 移動用モータ
+PwmOut motor2(PA_6);  // 移動用モータ
+uint8_t ready_flag_A = 0;
+uint8_t ready_flag_B = 0;
+uint8_t supply_state = 0;
+uint8_t move_arm_flag = 0;
 
 // プロトタイプ宣言
 float make_arctan ( int8_t from_degree, int8_t to_degree, uint16_t t, uint16_t max_time, float x_p, float y_p );
 void move ( uint8_t move_mode, uint8_t time_mode, uint16_t move_time );
 void move_arm ( int8_t from_degree1, int8_t to_degree1, int8_t from_degree2, int8_t to_degree2, uint16_t move_arm_time, float x_p, float y_p );
+
+
+// Xbee_Bが受信したら実行する関数
+void callback(){
+    if( pc.getc()<10 ) {
+    	// 0:空白状態, 1:こちらが供給権, 2:相手が供給権
+    	supply_state = pc.getc();
+    }
+    else if( (pc.getc()>=10)&&(pc.getc()<100) ) {
+    	// 10:A未完, 11:A完了, 20:B未完, 21:B完了
+    	ready_flag_A = pc.getc();
+    }
+    else if( (pc.getc()>=100)&&(pc.getc()<1000) ) {
+    	// 100:フラグOFF, 101:フラグON
+    	move_arm_flag = pc.getc();
+    }
+}
 
 
 // B機メイン関数
@@ -21,16 +43,17 @@ int main() {
 	pc.baud(115200);  // ボーレートの設定
 	servo1.period(0.014);  // サーボの周期
 	servo2.period(0.014);  // サーボの周期
+	pc.attach( &callback );  // Xbeeが受信したらcallback関数を実行
 
 	// 戦闘準備 (開始後の定位置へのレール移動)
 	while ( !mag.read() ) {
 		move(2, 0, 0);
 	}
 	move(1, 1, 2000);  // 戦闘位置まで後進
-	ready_flag_B = 1;  // B機は準備OK
+	ready_flag_B = 21;  // B機は準備OK
 
 	// A機・B機両方の準備が整うまで待機
-	while ( ( !xbee.read(ready_flag_A) )||( !ready_flag_B ) ) {
+	while ( !(ready_flag_A==11) || !(ready_flag_B==21) ) {
 
 	}
 
@@ -39,11 +62,12 @@ int main() {
 	// 最初の供給権確保へ (A機はスレッド起動中なので少し時間かけてもよい)
 	move_arm(-90, 0, -90, -60, 3500, 30, 90);
 
+	// メインループ
 	while ( true ) {
 
 		// ステートが2で，かつ，アームフラグ=1が立てられたら，アームを動かして供給権取り返す
-		if ( ( xbee.read(supply_state) == 2 )&&( xbee.read(move_arm_flag) == 1 ) ) {
-			move_arm_flag = 0;  // アームフラグクリア
+		if ( ( supply_state == 2 )&&( move_arm_flag == 101 ) ) {
+			pc.putc(100);  // アームフラグクリア&送信
 			move_arm(0, -60, -60, 0, 2000, 30, 90);
 			move_arm(-60, 0, 0, -60, 2000, 30, 90);
 		}
@@ -52,36 +76,6 @@ int main() {
 		}
 
 	}
-
-}
-
-
-// テスト用関数
-void debug_test () {
-
-	// アーム移動テスト
-	//move_arm( 0, -45, 0, -45, 3000, 30, 90);
-	//move_arm( -45, 0, -45, 0, 3000, 30, 90);
-
-	/*
-	// マグネットテスト
-	while ( true ) {
-		uint8_t mag_val = mag.read();
-		//pc.printf("%d\n", mag_val);
-
-		if ( mag_val == 0 ) {
-			move(1,0,0);
-		}
-		else if ( mag_val == 1 ) {
-			move(0,0,0);
-			break;
-		}
-	}
-	*/
-
-	// レール移動テスト
-	//move(1, 1, 3000);
-	//move(2, 1, 3000);
 
 }
 
