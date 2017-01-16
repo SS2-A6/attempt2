@@ -7,6 +7,7 @@ extern Timer timer;
 extern uint8_t supply_state;
 extern uint8_t first_ball_flag;
 extern int before_time;
+extern uint8_t move_arm_flag;
 
 
 int move_arm_time = 0;  // 最後にアームを動かした時刻を記録しておく
