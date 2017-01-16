@@ -24,12 +24,11 @@ void state_work() {
 
 		// 供給権を紛失し，相手が保持しているとき
 		else if (supply_state == 2) {
-			pc.printf("*** move arm!!\n");  // 実験用
 			// 供給権を取り返すため，アームフラグを立て，B機に動かしてもらう
-			move_arm_flag = 1;
+			pc.putc(101);
 			first_ball_flag = 1;  // 次出てくるピンポン球は第1球として扱うので注意
 			// B機側でアームフラグが降ろされるまで次に進まない
-			while ( xbee.read(move_arm_flag) == 1 ) {
+			while ( move_arm_flag == 100 ) {
 			}
 			supply_state = 0;
 			move_arm_time = timer.read_ms();  // 最後にアームを動かした時刻を記録しておく
