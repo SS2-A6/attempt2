@@ -1,0 +1,6 @@
+:symbols:
+  - C_FLAGS
+  - ASM_FLAGS
+  - CXX_FLAGS
+:includes:
+  - INCLUDE_PATHS

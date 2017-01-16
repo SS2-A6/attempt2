@@ -43,3 +43,15 @@ config.yaml
 .*.swp
 .*.swo
 .*DS_Store
+.cproject
+.project
+.settings/
+BUILD/
+.*swo
+.*swp
+symbols/
+backup/
+.idea/
+.vscode/
+*.pyc
+cmake-build*/
