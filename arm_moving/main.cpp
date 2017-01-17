@@ -4,8 +4,8 @@
 
 Serial pc(PA_9, PA_10);  // Xbee_B
 Serial debug(USBTX, USBRX);  // デバッグ用
-PwmOut servo1(PB_3);  // 中央の超音波センサ用アーム
-PwmOut servo2(PB_4);  // 手前の超音波センサ用アーム
+PwmOut servo1(PB_3);  // 中央の超音波センサ用アーム (適正角度 : 0 ~ -75)
+PwmOut servo2(PB_4);  // 手前の超音波センサ用アーム (適正角度 : 0 ~ +85)
 DigitalIn mag(PB_5);  // マグネットセンサ
 PwmOut motor1(PA_5);  // 移動用モータ
 PwmOut motor2(PA_6);  // 移動用モータ
@@ -30,7 +30,7 @@ void callback(){
     }
     else if( (var>=10)&&(var<100) ) {
     	// 10:A未完, 11:A完了, 20:B未完, 21:B完了
-    	ready_flag_A = pc.getc();
+    	ready_flag_A = var;
     }
     else if( (var>=100)&&(var<1000) ) {
     	// 100:フラグOFF, 101:フラグON
@@ -43,27 +43,41 @@ void callback(){
 // B機メイン関数
 int main() {
 
-	pc.baud(115200);  // ボーレートの設定
+	debug.baud(115200);
+	pc.baud(9600);  // ボーレートの設定
 	servo1.period(0.014);  // サーボの周期
 	servo2.period(0.014);  // サーボの周期
 	pc.attach( &callback );  // Xbeeが受信したらcallback関数を実行
 
+	debug.printf("Start.\n");
+	move_arm(-75, -45, 45, 85, 2000, 30, 90);
+	move_arm(-45, -75, 85, 45, 2000, 30, 90);
+	move_arm(-75, -45, 45, 85, 2000, 30, 90);
+	move_arm(-45, -75, 85, 45, 2000, 30, 90);
+
 	// 戦闘準備 (開始後の定位置へのレール移動)
-	while ( !mag.read() ) {
+	//while ( !mag.read() ) {
+	while ( !mag ) {
 		move(2, 0, 0);
+		debug.printf("%d\n", mag.read());
 	}
+	debug.printf("mag read OK.\n");
 	move(1, 1, 2000);  // 戦闘位置まで後進
+	debug.printf("move set OK.\n");
 	ready_flag_B = 21;  // B機は準備OK
+	pc.putc(21);
+	debug.printf("B is OK.  Waiting for A...\n");
 
 	// A機・B機両方の準備が整うまで待機
-	while ( !((ready_flag_A==11)&&(ready_flag_B==21)) ) {
+	//while ( !((ready_flag_A==11)&&(ready_flag_B==21)) ) {
 
-	}
+	//}
+	debug.printf("A&B are OK. Misson Start!\n");
 
 	// B機戦闘開始
 
 	// 最初のアーム振り下ろしへ (A機はスレッド起動中なので少し時間かけてもよい)
-	move_arm(-90, 0, -90, -60, 3500, 30, 90);
+	move_arm(0, -75, 0, 45, 3500, 30, 90);
 
 	// メインループ
 	while ( true ) {
@@ -71,8 +85,8 @@ int main() {
 		// ステートが2で，かつ，アームフラグ=1が立てられたら，アームを動かして供給権取り返す
 		if ( ( supply_state == 2 )&&( move_arm_flag == 101 ) ) {
 			pc.putc(100);  // アームフラグクリア&送信
-			move_arm(0, -60, -60, 0, 2000, 30, 90);
-			move_arm(-60, 0, 0, -60, 2000, 30, 90);
+			move_arm(-75, -45, 45, 85, 2000, 30, 90);
+			move_arm(-45, -75, 85, 45, 2000, 30, 90);
 		}
 		// それ以外のステートならば，B機はステイする
 		else {
