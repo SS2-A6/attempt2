@@ -49,32 +49,37 @@ int main() {
 	servo2.period(0.014);  // サーボの周期
 	pc.attach( &callback );  // Xbeeが受信したらcallback関数を実行
 
-	debug.printf("Start.\n");
-	move_arm(-75, -45, 45, 85, 2000, 30, 90);
-	move_arm(-45, -75, 85, 45, 2000, 30, 90);
-	move_arm(-75, -45, 45, 85, 2000, 30, 90);
-	move_arm(-45, -75, 85, 45, 2000, 30, 90);
+	debug.printf("\n\rStart.\n\r");
+	move_arm(0,0,0,0, 2000, 30, 90);
+
+	DigitalIn button(USER_BUTTON);
+	while(button);
 
 	// 戦闘準備 (開始後の定位置へのレール移動)
 	//while ( !mag.read() ) {
 	while ( !mag ) {
 		move(2, 0, 0);
-		debug.printf("%d\n", mag.read());
+		debug.printf("%d\n\r", mag.read());
 	}
-	debug.printf("mag read OK.\n");
+	debug.printf("mag read OK.\n\r");
+
 	move(1, 1, 2000);  // 戦闘位置まで後進
-	debug.printf("move set OK.\n");
+	debug.printf("move set OK.\n\r");
+
 	ready_flag_B = 21;  // B機は準備OK
-	pc.putc(21);
-	debug.printf("B is OK.  Waiting for A...\n");
+	debug.printf("B is OK.  Waiting for A...\n\r");
 
 	// A機・B機両方の準備が整うまで待機
 	//while ( !((ready_flag_A==11)&&(ready_flag_B==21)) ) {
-
+		pc.putc(21);
+		Thread::wait(100);
 	//}
-	debug.printf("A&B are OK. Misson Start!\n");
+
+	debug.printf("A&B are OK. Misson Start!\n\r");
+
 
 	// B機戦闘開始
+
 
 	// 最初のアーム振り下ろしへ (A機はスレッド起動中なので少し時間かけてもよい)
 	move_arm(0, -75, 0, 45, 3500, 30, 90);
@@ -83,10 +88,13 @@ int main() {
 	while ( true ) {
 
 		// ステートが2で，かつ，アームフラグ=1が立てられたら，アームを動かして供給権取り返す
-		if ( ( supply_state == 2 )&&( move_arm_flag == 101 ) ) {
+		//if ( ( supply_state == 2 )&&( move_arm_flag == 101 ) ) {
+		if ( ( move_arm_flag == 101 ) ) {
 			pc.putc(100);  // アームフラグクリア&送信
 			move_arm(-75, -45, 45, 85, 2000, 30, 90);
 			move_arm(-45, -75, 85, 45, 2000, 30, 90);
+			move_arm_flag = 100; // clear
+			pc.putc(move_arm_flag);
 		}
 		// それ以外のステートならば，B機はステイする
 		else {
