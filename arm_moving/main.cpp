@@ -3,7 +3,7 @@
 // B機：情報を受信してアームを動かし，供給権奪取
 
 Serial pc(PA_9, PA_10);  // Xbee_B
-Serial debug(USBTX, USBRX);  // デバッグ用print
+Serial debug(USBTX, USBRX);  // デバッグ用
 PwmOut servo1(PB_3);  // 中央の超音波センサ用アーム
 PwmOut servo2(PB_4);  // 手前の超音波センサ用アーム
 DigitalIn mag(PB_5);  // マグネットセンサ
@@ -22,18 +22,21 @@ void move_arm ( int8_t from_degree1, int8_t to_degree1, int8_t from_degree2, int
 
 // Xbee_Bが受信したら実行する関数
 void callback(){
-    if( pc.getc()<10 ) {
+
+	char var = pc.getc();
+    if( var<10 ) {
     	// 0:空白状態, 1:こちらが供給権, 2:相手が供給権
-    	supply_state = pc.getc();
+    	supply_state = var;
     }
-    else if( (pc.getc()>=10)&&(pc.getc()<100) ) {
+    else if( (var>=10)&&(var<100) ) {
     	// 10:A未完, 11:A完了, 20:B未完, 21:B完了
     	ready_flag_A = pc.getc();
     }
-    else if( (pc.getc()>=100)&&(pc.getc()<1000) ) {
+    else if( (var>=100)&&(var<1000) ) {
     	// 100:フラグOFF, 101:フラグON
-    	move_arm_flag = pc.getc();
+    	move_arm_flag = var;
     }
+
 }
 
 
@@ -53,13 +56,13 @@ int main() {
 	ready_flag_B = 21;  // B機は準備OK
 
 	// A機・B機両方の準備が整うまで待機
-	while ( !(ready_flag_A==11) || !(ready_flag_B==21) ) {
+	while ( !((ready_flag_A==11)&&(ready_flag_B==21)) ) {
 
 	}
 
 	// B機戦闘開始
 
-	// 最初の供給権確保へ (A機はスレッド起動中なので少し時間かけてもよい)
+	// 最初のアーム振り下ろしへ (A機はスレッド起動中なので少し時間かけてもよい)
 	move_arm(-90, 0, -90, -60, 3500, 30, 90);
 
 	// メインループ
