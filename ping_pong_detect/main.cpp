@@ -3,6 +3,7 @@
 #include <attempt2/board.h>
 // A機：静止してボール検知 & ステート管理
 
+RGB led(PA_15, PC_12, PC_10, 0, 1);
 Serial pc(PA_9, PA_10);  // Xbee_A
 Serial debug(USBTX, USBRX);  // デバッグ用
 PwmOut servo1(PB_3);  // 栓抜き用サーボ
@@ -25,7 +26,6 @@ float make_arctan ( int8_t from_degree, int8_t to_degree, uint16_t t, uint16_t m
 
 
 // Xbee_Aが受信したら実行する関数
-RGB led(PA_15, PC_12, PC_10, 0, 1);
 void callback(){
 
 	char var = pc.getc();
@@ -54,6 +54,7 @@ void callback(){
 // A機メイン関数
 int main() {
 
+	led.red();
 	pc.baud(9600);
 	debug.baud(115200);
 	Thread thread1;  // ball_psd_read() を回すスレッド
@@ -69,6 +70,7 @@ int main() {
 	while ( !(ready_flag_B==21) ) {
 	}
 	debug.printf("A&B are OK. Mission Start!\n");
+	led.green();
 
 	// A機戦闘開始
 	timer.start();
