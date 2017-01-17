@@ -3,12 +3,13 @@
 
 Serial pc(USBTX, USBRX);
 
-#define serial
+#define rgb_
 
 #ifdef rgb_
 //DigitalOut myled(LED1);
 //RGB led;
-RGB led(PA_15, PC_12, PC_10, 0, 1);
+//RGB led(PA_15, PC_12, PC_10, 0, 1);
+RGB led;
 
 int main() {
     DigitalOut myled(LED1);     // LED1 == PA_5
