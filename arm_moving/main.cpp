@@ -1,7 +1,9 @@
 #include <mbed.h>
 #include <math.h>
+#include "attempt2/board.h"
 // B機：情報を受信してアームを動かし，供給権奪取
 
+RGB led;
 Serial pc(PA_9, PA_10);  // Xbee_B
 Serial debug(USBTX, USBRX);  // デバッグ用
 PwmOut servo1(PB_3);  // 中央の超音波センサ用アーム (適正角度 : 0 ~ -75)
@@ -43,6 +45,7 @@ void callback(){
 // B機メイン関数
 int main() {
 
+	led.red();
 	debug.baud(115200);
 	pc.baud(9600);  // ボーレートの設定
 	servo1.period(0.014);  // サーボの周期
@@ -54,6 +57,7 @@ int main() {
 
 	DigitalIn button(USER_BUTTON);
 	while(button);
+	led.yellow();
 
 	// 戦闘準備 (開始後の定位置へのレール移動)
 	//while ( !mag.read() ) {
@@ -68,6 +72,7 @@ int main() {
 
 	ready_flag_B = 21;  // B機は準備OK
 	debug.printf("B is OK.  Waiting for A...\n\r");
+	led.green();
 
 	// A機・B機両方の準備が整うまで待機
 	//while ( !((ready_flag_A==11)&&(ready_flag_B==21)) ) {
@@ -88,7 +93,6 @@ int main() {
 	while ( true ) {
 
 		// ステートが2で，かつ，アームフラグ=1が立てられたら，アームを動かして供給権取り返す
-		//if ( ( supply_state == 2 )&&( move_arm_flag == 101 ) ) {
 		if ( ( move_arm_flag == 101 ) ) {
 			pc.putc(100);  // アームフラグクリア&送信
 			move_arm(-75, -45, 45, 85, 2000, 30, 90);
