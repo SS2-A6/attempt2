@@ -1,13 +1,16 @@
-#include "mbed.h"
-#include "attempt2.h"
+#include <mbed.h>
+#include <attempt2.h>
+// A機：静止してボール検知 & ステート管理
 
 extern Serial pc;
+extern Serial debug;
 extern uint16_t ball_count;
 extern Timer timer;
 extern uint8_t supply_state;
 extern uint8_t first_ball_flag;
 extern int before_time;
 extern uint8_t move_arm_flag;
+extern Mutex mutex;
 
 
 int move_arm_time = 0;  // 最後にアームを動かした時刻を記録しておく

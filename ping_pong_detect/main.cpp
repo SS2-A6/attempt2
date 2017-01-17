@@ -1,19 +1,10 @@
 #include <mbed.h>
 #include <attempt2.h>
-#include "attempt2/board.h"
+#include <attempt2/board.h>
 // A機：静止してボール検知 & ステート管理
 
-extern int before_time;
-extern uint32_t ball_psd;
-extern int32_t ball_psd_diff;
-extern int move_arm_time;
-
-// プロトタイプ宣言
-void move_arm ( int8_t from_degree1, int8_t to_degree1, int8_t from_degree2, int8_t to_degree2, uint16_t move_arm_time, float x_p, float y_p );
-float make_arctan ( int8_t from_degree, int8_t to_degree, uint16_t t, uint16_t max_time, float x_p, float y_p );
-
 Serial pc(PA_9, PA_10);  // Xbee_A
-Serial debug(USBTX, USBRX);  // デバッグ用print
+Serial debug(USBTX, USBRX);  // デバッグ用
 PwmOut servo1(PB_3);  // 栓抜き用サーボ
 PwmOut servo2(PB_4);  // 未使用サーボ
 Timer timer;
@@ -23,17 +14,28 @@ uint8_t ready_flag_B = 0;
 uint8_t supply_state = 0;
 uint8_t move_arm_flag = 0;
 Mutex mutex;
+extern int before_time;
+extern uint32_t ball_psd;
+extern int32_t ball_psd_diff;
+extern int move_arm_time;
+
+// プロトタイプ宣言
+void move_arm ( int8_t from_degree1, int8_t to_degree1, int8_t from_degree2, int8_t to_degree2, uint16_t move_arm_time, float x_p, float y_p );
+float make_arctan ( int8_t from_degree, int8_t to_degree, uint16_t t, uint16_t max_time, float x_p, float y_p );
 
 
 // Xbee_Aが受信したら実行する関数
 RGB led(PA_15, PC_12, PC_10, 0, 1);
 void callback(){
+
 	char var = pc.getc();
+	/*実験用
 	debug.putc(var);
 	led.red();
 	Thread::wait(100);
 	led.black();
-    if( var<10 ) {
+	*/
+	if( var<10 ) {
     	// 0:空白状態, 1:こちらが供給権, 2:相手が供給権
     	supply_state = var;
     }
@@ -45,6 +47,7 @@ void callback(){
     	// 100:フラグOFF, 101:フラグON
     	move_arm_flag = var;
     }
+
 }
 
 
@@ -52,8 +55,7 @@ void callback(){
 int main() {
 
 	pc.baud(9600);
-	debug.bau5d(115200);
-	debug.printf("Hello World!\n");
+	debug.baud(115200);
 	Thread thread1;  // ball_psd_read() を回すスレッド
 	Thread thread2;  // state_work() を回すスレッド
 	pc.attach( &callback );  // Xbeeが受信したらcallback関数を実行
@@ -63,7 +65,7 @@ int main() {
 	ready_flag_A = 11;  // A機は準備OK
 
 	// A機・B機両方の準備が整うまで待機
-	while ( !(ready_flag_A==11) || !(ready_flag_B==21) ) {
+	while ( !((ready_flag_A==11)&&(ready_flag_B==21)) ) {
 
 	}
 
@@ -81,19 +83,16 @@ int main() {
 		debug.printf("thread2 error!!\n");
 	}
 
-	// メインループ(2つのスレッド動作中)
+	// メインループ (2つのスレッドが背後で動作中)
 	for(;;){
 
 		/* 実験用
 		mutex.lock();
-		pc.printf("state=%d, ball_count=%d, psd=%lu, psd_diff=%ld, before_time=%d, now_time=%d, time_over=%d \n",
+		debug.printf("state=%d, ball_count=%d, psd=%lu\n",
 				supply_state,
 				ball_count,
 				ball_psd,
-				ball_psd_diff,
-				before_time,
-				timer.read_ms(),
-				timer.read_ms()-before_time);
+				);
 		mutex.unlock();
 		*/
 
@@ -133,3 +132,11 @@ float make_arctan ( int8_t from_degree, int8_t to_degree, uint16_t t, uint16_t m
 	return (to_val - from_val)/M_PI * atan( c*(t - max_time/2.0) ) + (from_val + to_val)/2.0;
 
 }
+
+
+///////////////////////////////////
+// サーボ実験データ (Futaba S3003, 5V)
+//-90 : servo.pulsewidth(0.00060);
+// 00 : servo.pulsewidth(0.00140);
+//+90 : servo.pulsewidth(0.00220);
+///////////////////////////////////
