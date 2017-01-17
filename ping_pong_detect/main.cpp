@@ -63,11 +63,12 @@ int main() {
 	// 戦闘準備 (サーボでブリッジをかける)
 	move_arm(0, 60, 0, 0, 2000, 30, 90);  // サーボ1を用いて栓抜きを行う
 	ready_flag_A = 11;  // A機は準備OK
+	debug.printf("A is OK.  Waiting for B...\n");
 
-	// A機・B機両方の準備が整うまで待機
-	while ( !((ready_flag_A==11)&&(ready_flag_B==21)) ) {
-
+	// B機の準備が整うまで待機
+	while ( !(ready_flag_B==21) ) {
 	}
+	debug.printf("A&B are OK. Mission Start!\n");
 
 	// A機戦闘開始
 	timer.start();
@@ -91,10 +92,10 @@ int main() {
 		debug.printf("state=%d, ball_count=%d, psd=%lu\n",
 				supply_state,
 				ball_count,
-				ball_psd,
+				ball_psd
 				);
 		mutex.unlock();
-		*/
+		/*/
 
 	}
 

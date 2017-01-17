@@ -32,6 +32,7 @@ void ball_psd_read() {
 		if (ball_psd_diff < -ball_psd_offset) {
 			ball_count++;
 			supply_state = 1;
+			debug.printf("1 now\n");
 			before_time = timer.read_ms();
 			Thread::wait(500);
 		}

@@ -32,9 +32,10 @@ void state_work() {
 			pc.putc(101);
 			first_ball_flag = 1;  // 次出てくるピンポン球は第1球として扱うので注意
 			// B機側でアームフラグが降ろされるまで次に進まない
-			while ( move_arm_flag == 100 ) {
-			}
+			//while ( move_arm_flag == 100 ) {
+			//}
 			supply_state = 0;
+			debug.printf("2 >> 0\n");
 			move_arm_time = timer.read_ms();  // 最後にアームを動かした時刻を記録しておく
 		}
 
@@ -44,11 +45,12 @@ void state_work() {
 			// もしも空白状態が長く続いているなら供給権紛失している可能性があるので，再び supply_state = 2 へ入って危機回避
 			if ( (timer.read_ms() - move_arm_time) > rescue_time ) {
 				supply_state = 2;
+				debug.printf("0 >> 2\n");
 			}
 		}
 
 	}
-
+	debug.printf("state work terninated!\n\r");
 }
 
 
@@ -74,6 +76,7 @@ void supply_me( int now_time ) {
 		// 供給権紛失条件
 		if (time_eq(now_time - before_time, 2000+time_offset, time_err)) {
 			supply_state = 2;
+			debug.printf("1 >> 2\n");
 		}
 		// 落ち続けていれば，そのままステイ
 		else {
@@ -85,6 +88,7 @@ void supply_me( int now_time ) {
 		// 供給権紛失条件
 		if (time_eq(now_time - before_time, 1500+time_offset, time_err)) {
 			supply_state = 2;
+			debug.printf("1 >> 2\n");
 		}
 		// 落ち続けていれば，そのままステイ
 		else {
@@ -96,6 +100,7 @@ void supply_me( int now_time ) {
 		// 供給権紛失条件
 		if (time_eq(now_time - before_time, 1000+time_offset, time_err)) {
 			supply_state = 2;
+			debug.printf("1 >> 2\n");
 		}
 		// 落ち続けていれば，そのままステイ
 		else {
