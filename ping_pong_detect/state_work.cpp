@@ -16,7 +16,7 @@ extern RGB led;
 
 
 int move_arm_time = 0;  // 最後にアームを動かした時刻を記録しておく
-#define rescue_time 5000  // 空白状態での供給権紛失を回避するための制限時間
+#define rescue_time 8000  // 空白状態での供給権紛失を回避するための制限時間
 // ステートごとに動作を行う関数
 void state_work() {
 

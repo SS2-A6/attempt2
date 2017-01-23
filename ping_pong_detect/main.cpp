@@ -54,12 +54,17 @@ void callback(){
 // A機メイン関数
 int main() {
 
+	move_arm(95, 95, 0, 0, 2000, 30, 90);
 	led.red();
 	pc.baud(9600);
 	debug.baud(115200);
 	Thread thread1;  // ball_psd_read() を回すスレッド
 	Thread thread2;  // state_work() を回すスレッド
 	pc.attach( &callback );  // Xbeeが受信したらcallback関数を実行
+
+	DigitalIn button(USER_BUTTON);
+	while(button);
+	led.yellow();
 
 	// 戦闘準備 (サーボでブリッジをかける)
 	move_arm(0, 60, 0, 0, 2000, 30, 90);  // サーボ1を用いて栓抜きを行う
