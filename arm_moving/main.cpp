@@ -45,6 +45,7 @@ void callback(){
 // B機メイン関数
 int main() {
 
+	uint8_t magnet_count = 0;
 	led.red();
 	debug.baud(115200);
 	pc.baud(9600);  // ボーレートの設定
@@ -60,10 +61,19 @@ int main() {
 	led.yellow();
 
 	// 戦闘準備 (開始後の定位置へのレール移動)
-	//while ( !mag.read() ) {
-	while ( !mag ) {
+	//while (1){ debug.printf("%d\n\r", mag.read()); }
+	while ( 1 ) {
 		move(2, 0, 0);
-		debug.printf("%d\n\r", mag.read());
+		int magread = mag.read();
+		debug.printf("%d count=%d\n\r", mag.read(), magnet_count);
+		if (magread == 0){
+			magnet_count++;
+			if (magnet_count == 2){
+				debug.printf("End magnet loop\n\r");
+				break;
+			}
+			Thread::wait(2000);
+		}
 	}
 	debug.printf("mag read OK.\n\r");
 
