@@ -1,3 +1,4 @@
+#define BACK
 #include <mbed.h>
 #include <math.h>
 #include "attempt2/board.h"
@@ -72,12 +73,21 @@ int main() {
 				debug.printf("End magnet loop\n\r");
 				break;
 			}
-			Thread::wait(2000);
+			Thread::wait(1500);
 		}
 	}
 	debug.printf("mag read OK.\n\r");
 
-	move(1, 1, 1500);  // 戦闘位置まで後進
+#ifdef BACK
+	/*
+	 *  8V -10 枕木
+	 *  7V -7 枕木 OK
+	 *  6V -5 枕木
+	 */
+	move(1, 1, 1000);  // 戦闘位置まで後進
+#else
+	move(0, 0, 0);
+#endif
 	debug.printf("move set OK.\n\r");
 
 	ready_flag_B = 21;  // B機は準備OK
