@@ -14,7 +14,7 @@ extern Mutex mutex;
 
 
 int move_arm_time = 0;  // 最後にアームを動かした時刻を記録しておく
-#define rescue_time 10000  // 空白状態での供給権紛失を回避するための制限時間
+#define rescue_time 5000  // 空白状態での供給権紛失を回避するための制限時間
 // ステートごとに動作を行う関数
 void state_work() {
 
@@ -96,7 +96,7 @@ void supply_me( int now_time ) {
 	}
 
 	// 終盤戦 (120s-180s)
-	else if ((now_time >= 1000 * 120) && (now_time < 1000 * 180)) {
+	else if (now_time >= 1000 * 120) {
 		// 供給権紛失条件
 		if (time_eq(now_time - before_time, 1000+time_offset, time_err)) {
 			supply_state = 2;
