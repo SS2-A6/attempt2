@@ -1,5 +1,6 @@
 #include <mbed.h>
 #include <attempt2.h>
+#include "attempt2/board.h"
 // A機：静止してボール検知 & ステート管理
 
 extern Serial pc;
@@ -11,6 +12,7 @@ extern uint8_t first_ball_flag;
 extern int before_time;
 extern uint8_t move_arm_flag;
 extern Mutex mutex;
+extern RGB led;
 
 
 int move_arm_time = 0;  // 最後にアームを動かした時刻を記録しておく
@@ -22,12 +24,14 @@ void state_work() {
 
 		// 供給権を持っていると"思われる"とき
 		if (supply_state == 1) {
+			led.green();
 			// 供給権を確認し，紛失していたら supply_state=2 へ
 			supply_me( timer.read_ms() );
 		}
 
 		// 供給権を紛失し，相手が保持しているとき
 		else if (supply_state == 2) {
+			led.red();
 			// 供給権を取り返すため，アームフラグを立て，B機に動かしてもらう
 			pc.putc(101);
 			first_ball_flag = 1;  // 次出てくるピンポン球は第1球として扱うので注意
@@ -41,6 +45,7 @@ void state_work() {
 
 		// どっちに供給権があるのか不明な，空白状態のとき
 		else if (supply_state == 0) {
+			led.yellow();
 			// 基本は何もしないでステイ．
 			// もしも空白状態が長く続いているなら供給権紛失している可能性があるので，再び supply_state = 2 へ入って危機回避
 			if ( (timer.read_ms() - move_arm_time) > rescue_time ) {
